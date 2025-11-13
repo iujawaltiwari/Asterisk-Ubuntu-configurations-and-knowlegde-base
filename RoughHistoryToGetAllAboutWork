@@ -1,0 +1,150 @@
+ 1.apt-get update -y
+    2  sudo apt-get update -y
+    3  sudo apt-get install sox pkg-config libedit-dev unzip git gnupg2 curl libnewt-dev libssl-dev libncurses5-dev subversion libsqlite3-dev build-essential libjansson-dev libxml2-dev uuid-dev subversion -y
+    4  wget https://downloads.asterisk.org/pub/telephony/asterisk/asterisk-22-current.tar.gz
+    5  tar -xvzf asterisk-22-current.tar.gz
+    6  ls
+    7  cd asterisk-22.6.0/
+    8  ls
+    9  contrib/scripts/get_mp3_source.sh
+   10  contrib/scripts/install_prereq install
+   11  sudo contrib/scripts/get_mp3_source.sh
+   12  sudo contrib/scripts/install_prereq install
+   13  ./configure
+   14  make menuselect
+   15  make -j2
+   16  make install
+   17  make samples
+   18  sudo make install
+   19  sudo make samples
+   20  sudo make config
+   21  ldconfig
+   22  sudo ldconfig
+   23  sudo groupadd asterisk
+   24  sudo useradd -r -d /var/lib/asterisk -g asterisk asterisk
+   25  sudo usermod -aG audio,dialout asterisk
+   26  sudo chown -R asterisk:asterisk /etc/asterisk
+   27  sudo chown -R asterisk:asterisk /var/{lib,log,spool}/asterisk
+   28  sudo chown -R asterisk:asterisk /usr/lib/asterisk
+   29  sudo vi /etc/default/asterisk
+   30  sudo vi /etc/asterisk/asterisk.conf
+   31  systemctl restart asterisk
+   32  saadgeaif
+   33  sudo systemctl restart asterisk
+   34  sudo systemctl enable asterisk
+   35  sudo systemctl status asterisk
+   36  sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
+   37  sudo sed -i 's";\[radius\]"\[radius\]"g' /etc/asterisk/cdr.conf
+   38  sudo sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cdr.conf
+   39  sudo sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg =>
+   40  /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
+   41  sudo sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg =>
+   42  /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
+   43  sudo sed -i 's";radiuscfg => /usr/local/etc/radiusclient-ng/radiusclient.conf"radiuscfg => /etc/radcli/radiusclient.conf"g' /etc/asterisk/cel.conf
+   44  sudo systemctl start asterisk
+   45  sudo systemctl status asterisk
+   46  sudo systemctl restart asterisk
+   47  sudo systemctl status asterisk
+   48  sudo asterisk -rvv
+   49  sudo systemctl status asterisk
+   50  sudo asterisk -rvvvvvvvvvvvvvvv
+   51  cd
+   52  sudo asterisk -rvvvv
+   53  sudo systemctl restart asterisk
+   54  sudo asterisk -rvvvv
+   55  ls
+   56  history
+   57  ls
+   58  ks
+   59  ls
+   60  htop
+   61  ls
+   62  cd /etc/
+   63  ls
+   64  cd asterisk/
+   65  ls
+   66  sudo vi asterisk.conf
+   67  ls
+   68  cd
+   69  find -name "extention"
+   70  find -name "extent*"
+   71  find / -name "extention"
+   72  sudo find / -name "extention"
+   73  ls
+   74  cd asterisk-22.6.0/
+   75  ls
+   76  cd agi/
+   77  ls
+   78  cd
+   79  cd /etc/asterisk
+   80  ls
+   81  sudo vi pjsip.conf
+   82  sudo vi stir_shaken.conf
+   83  ls
+   84  sudo vi rtp.conf
+   85  ls
+   86  cd
+   87  cd /usr/src/
+   88  ls
+   89  cd ..
+   90  ls
+   91  cd lib
+   92  ls
+   93  cd asterisk/
+   94  ls
+   95  cd modules/
+   96  ls
+   97  cd ..
+   98  ls
+   99  cd ..
+  100  ls
+  101  cd ..
+  102  ls
+  103  cd
+  104  l
+  105  sudo asterisk-rvvvvvvvvvvv
+  106  sudo asterisk -rvvvvvvvvvvv
+  107  ls
+  108  sudo asterisk -rvvvv
+  109  sudo apt install mariadb-server apache2 php libapache2-mod-php php-intl php-mysql php-curl php-cli php-zip php-xml php-gd php-common php-mbstring php-xmlrpc php-bcmath php-json php-sqlite3 php-soap php-zip php-ldap php-imap php-cas -y
+  110  sudo wget http://mirror.freepbx.org/modules/packages/freepbx/freepbx-17.0-latest.tgz
+  111  sudo tar -xvzf freepbx-17.0-latest.tgz
+  112  cd freepbx
+  113  sudo apt-get install nodejs npm -y
+  114  sudo ./install -n
+  115  cd freepbx/
+  116  sudo fwconsole ma install pm2
+  117  sudo sed -i 's/^\(User\|Group\).*/\1 asterisk/' /etc/apache2/apache2.conf
+  118  sudo sed -i 's/AllowOverride None/AllowOverride All/' /etc/apache2/apache2.conf
+  119  sudo sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/*/apache2/php.ini
+  120  sudo sed -i 's/\(^upload_max_filesize = \).*/\120M/' /etc/php/*/cli/php.ini
+  121  sudo a2enmod rewrite
+  122  sudo systemctl restart apache2
+  123  ip a
+  124  sudo systemctl restart apache2
+  125  ifconfig
+  126  ip addr
+  127  sudo systemctl status firewalld
+  128  sudo systemctl status apache2
+  129  sudo systemctl restart apache2
+  130  ls
+  131  cd
+  132  ls
+  133  free -h
+  134  df -h
+  135  ls
+  136  sudo asterisk -rvvvvvvvvvvv
+  137  cd /etc/
+  138  ls
+  139  cd apache2/
+  140  ls
+  141  cat ports.conf
+  142  ls
+  143  cd sites-available/
+  144  ls
+  145  cat 000-default.conf
+  146  ls
+  147  cat default-ssl.conf
+  148  cd ..
+  149  ls
+  150  cat apache2.conf
