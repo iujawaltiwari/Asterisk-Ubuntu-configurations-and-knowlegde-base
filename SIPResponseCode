@@ -1,1 +1,297 @@
+## A (Caller)  →  SIP Server (Asterisk/FreeSWITCH)  →  B (Receiver)
+
+STEP 1 — Caller Sends INVITE
+
+1️⃣ INVITE
+Caller sends:
+```
+INVITE sip:1001@server
+```
+Purpose: Start a call
+Includes: SDP (media, codecs, RTP ports)
+
+STEP 2 — Server Responds with Provisional Responses
+
+2️⃣ 100 Trying
+Server is processing the INVITE:
+```
+100 Trying
+```
+Meaning:
+✔ I received your INVITE
+✔ I’m checking routing
+✔ No ringing yet
+
+3️⃣ 180 Ringing
+
+Receiver's phone is ringing
+```
+180 Ringing
+```
+
+Meaning:
+✔ Phone is alerting
+✔ Caller hears RING tone
+
+4️⃣ 183 Session Progress
+
+Call is progressing with early media.
+```
+183 Session Progress
+```
+
+Meaning:
+✔ Call not answered yet
+✔ Media can flow (IVR, announcements, ringback, etc.)
+
+🔹 STEP 3 — Receiver Answers
+5️⃣ 200 OK
+
+Receiver accepted the call.
+```
+200 OK
+```
+
+Meaning:
+✔ Call is answered
+✔ Media (RTP) can start
+
+200 OK contains the callee SDP (RTP ports, codec).
+
+
+🔹 STEP 4 — ACK & Media
+6️⃣ ACK
+
+Caller acknowledges the 200 OK.
+```
+ACK
+```
+
+Meaning:
+✔ Session established
+✔ Voice audio (RTP) starts
+
+🔹 STEP 5 — RTP MEDIA
+```
+A <---- RTP (Voice) ----> B
+```
+This is your voice.
+
+🔹 STEP 6 — Call End
+7️⃣ BYE (Hangup)
+
+Either party hangs up.
+```
+BYE
+```
+
+8️⃣ 200 OK (to BYE)
+
+Call ended successfully.
+```
+200 OK
+```
+
+Full Flow 
+
+```
+A → INVITE → SERVER → INVITE → B
+A ← 100 Trying ← SERVER ← 100 Trying ← B
+A ← 180 Ringing ← SERVER ← 180 Ringing ← B
+A ← 200 OK ← SERVER ← 200 OK ← B
+A → ACK → SERVER → ACK → B
+A ↔ RTP ↔ SERVER ↔ RTP ↔ B
+A → BYE → SERVER → BYE → B
+A ← 200 OK ← SERVER ← 200 OK ← B
+```
+
+ALL IMPORTANT SIP STATUS CODES
+1xx — Provisional
+Code	Meaning
+100 Trying	Received INVITE
+180 Ringing	Phone ringing
+181 Call is Being Forwarded	Call forwarding
+183 Session Progress	Early media
+2xx — Success
+Code	Meaning
+200 OK	Success (INVITE, BYE, REGISTER, etc.)
+202 Accepted	Request accepted for processing
+3xx — Redirection
+Code	Meaning
+300 Multiple Choices	
+301 Moved Permanently	
+302 Moved Temporarily	Call forwarding by SIP server
+4xx — Client Error (your fault)
+Code	Meaning
+400 Bad Request	Syntax error
+401 Unauthorized	Need password
+403 Forbidden	Wrong credentials
+404 Not Found	Extension not found
+407 Proxy Authentication Required	
+408 Request Timeout	No response
+415 Unsupported Media	Codec mismatch
+480 Temporarily Unavailable	
+486 Busy Here	User busy
+488 Not Acceptable Here	SDP/codec mismatch
+5xx — Server Error
+Code	Meaning
+500 Server Internal Error	
+501 Not Implemented	
+503 Service Unavailable	Asterisk overload / trunk down
+6xx — Global Failure
+Code	Meaning
+603 Decline	User rejected call
+604 Does Not Exist Anywhere	
+606 Not Acceptable	
+📞 Short Explanation: Why SIP Call Fails?
+Common Real Issues:
+
+404 → wrong extension
+
+480 → SIP peer unreachable
+
+486 → busy
+
+488/415 → codec issue
+
+503 → carrier problem
+
+
+
+RTP FLOW DIAGRAM (Direct Media)
+```
+Caller (1001)                Callee (1002)
+     |                             |
+     |--- INVITE (SDP Offer) ----->|
+     |<-- 200 OK (SDP Answer) -----|
+     |-------- ACK ---------------->|
+     |                             |
+     |<====== RTP AUDIO ==========>|
+     |   Direct Media, UDP         |
+```
+✔ After ACK, RTP starts
+✔ Audio flows directly if NAT allows it
+
+NAT FLOW (RTP via Asterisk)
+When NAT blocks direct RTP, Asterisk acts as a RTP proxy.
+```
+Caller -------- INVITE ---------> Asterisk -------- INVITE ---------> Receiver
+  |                                 |                                |
+  |<---------- 200 OK --------------|------------ 200 OK ------------|
+  |------------- ACK -------------->|------------- ACK ------------->|
+  |                                 |                                |
+  |==== RTP ====> Asterisk <==== RTP =====> Receiver
+```
+✔ Asterisk rewrites SDP
+✔ Asterisk bridges RTP streams
+✔ Solves NAT / firewall issues
+
+SIP + WebRTC (DTLS + SRTP + ICE) FLOW
+```
+WebRTC Client                  Asterisk                   SIP Phone
+     |                             |                           |
+     |----- DTLS Offer ------------>|                           |
+     |                             |                           |
+     |<---- DTLS Answer ----------- |                           |
+     |                             |                           |
+     |------ INVITE (ICE) -------->| ----- INVITE (SDP) ------>|
+     |<------ 183 w/ICE -----------|<------ 183 ---------------|
+     |                             |                           |
+     |-------- STUN/TURN ICE Conn Checks ----------------------|
+     |                             |                           |
+     |<============ SRTP =========>|<========= RTP ===========>|
+```
+✔ WebRTC uses
+
+DTLS-SRTP
+
+ICE
+
+STUN/TURN
+✔ Asterisk can bridge to SIP/RTP
+
+SIP REGISTRATION FLOW
+```
+SIP Phone (1001)         Asterisk SIP Server
+      |                         |
+      |---- REGISTER ---------->|
+      |                         |
+      |<---- 401 Unauthorized --|
+      |---- REGISTER + Auth --->|
+      |                         |
+      |<----- 200 OK -----------|
+      |   Registered Successfully|
+```
+✔ All SIP phones must register
+✔ 401 challenge ensures authentication
+
+CALL TRANSFER FLOW (Attended)
+```
+A (Caller)                Agent B                     Agent C (Transfer Target)
+     |                       |                                  |
+     |------- INVITE ------->|                                  |
+     |<------ 200 OK --------|                                  |
+     |--------- ACK -------->|                                  |
+     |<====== RTP ==========>|                                  |
+     |                       |------- INVITE ------------------>|
+     |                       |<------ 200 OK -------------------|
+     |                       |---------- ACK ------------------->|
+     |                       |<==== RTP (B <-> C) =============>|
+     |
+     |<-- REFER (Refer-To: C) from B
+     |
+     |------ INVITE to C ---------------->|
+     |<------ 200 OK ---------------------|
+     |----------- ACK --------------------|
+     |<======= RTP (A <-> C) =============|
+```
+✔ Attended transfer involves:
+
+INVITE B
+
+INVITE C
+
+REFER to A
+✔ RTP flows switch from B→C to A→C
+
+VICIDIAL CALL FLOW (CAMPAIGN → AGENT)
+A. Agent Logs In
+```
+Agent Phone ---> Asterisk ----> Vicidial DB
+     |               |               |
+     |--- REGISTER --|               |
+     |<-- 200 OK ----|               |
+     |--- Login via Web ------------>|
+     |--- Update Agent Status ------>|
+```
+B. Vicidial Dials Leads Automatically
+```
+Vicidial Dialer Engine -----> Asterisk -----> Carrier -----> Customer
+        |                        |                 |
+        |--- Originate Call ---->|--- INVITE ----->|
+        |<-- 200 OK / RTP -------|<-- 200 OK ------|
+```
+✔ Carrier connects customer
+✔ Asterisk sends call status to Vicidial manager port (5038 AMI)
+
+C. Vicidial Connects Agent
+```
+Customer <===== RTP =====> Asterisk <===== RTP =====> Agent
+```
+Flow:
+
+Dialer calls agent phone (SIP or WebRTC)
+
+Agent auto-answers (via AMD or auto-call)
+
+Vicidial bridges customer + agent
+
+D. Call Disconnection
+```
+Customer Hangup ----> Asterisk ----> Vicidial  
+Agent Hangup --------> Asterisk ----> Vicidial
+```
+
+✔ Status stored in vicidial_closer_log / vicidial_log
+✔ Call recording saved
 
